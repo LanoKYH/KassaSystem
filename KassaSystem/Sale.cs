@@ -1,10 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace KassaSystem
 {
     public class Sale
     {
+        public List<SaleProducts> SaleItems { get; set; }
+        public Sale()
+        {
+            SaleItems = new List<SaleProducts>();
+        }
     }
+
 }
+
