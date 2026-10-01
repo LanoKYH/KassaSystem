@@ -6,8 +6,8 @@ namespace KassaSystem
 {
     public class SaleProducts
     {
-        public Product Product { get; set; } // Kopplar en säljrad till en produkt
-        public double Quantity { get; set; }
+        public Product Product { get; set; } // Kopplar en discount products till produkt class
+        public double Quantity { get; set; } 
 
     } 
 

@@ -6,5 +6,6 @@ namespace KassaSystem
 {
     public class ReceiptRepository
     {
+
     }
 }

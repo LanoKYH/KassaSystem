@@ -1,0 +1,11 @@
+﻿463;Coca-Cola;15;Styck
+242;Mjölk;20;Styck
+857;Äpplen;25;kg
+426;Kaffe;50;Styck
+924;Choklad;30;Styck
+143;Bröd;10;Styck
+342;Ost;40;Styck
+115;Smör;35;Styck
+592;Bananer;20;kg
+341;Tomater;15;kg
+523;Potatis;10;kg
