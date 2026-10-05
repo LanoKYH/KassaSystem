@@ -23,21 +23,88 @@ namespace KassaSystem
             {
                 case "1":
                     Sale sale = new Sale();
-                    Console.WriteLine("Skanna produkt:");
-                    string input = Console.ReadLine();
+                    double total = 0;
 
-                    string[] parts = input.Split(' ');
+                    while (true)
+                    {
+                        Console.WriteLine("Skanna produkt:");
+                        string input = Console.ReadLine();
 
-                    string productId = parts[0];
-                    double quantity = Convert.ToDouble(parts[1]);
+                        if (input == "PAY")
+                        {
+                            break;
+                        }
 
-                    Product product = products.Find(p => p.Id == productId);
+                        string[] parts = input.Split(' ');
 
-                    SaleProducts saleProduct = new SaleProducts();
-                    saleProduct.Product = product;
-                    saleProduct.Quantity = quantity;
+                        if (parts.Length != 2)
+                        {
+                            Console.WriteLine("Fel format. Skriv: produktID antal");
+                            continue;
+                        }
 
-                    sale.SaleItems.Add(saleProduct); // skriv while loop senare
+                        string productId = parts[0];
+
+                        if (!double.TryParse(parts[1], out double quantity))
+                        {
+                            Console.WriteLine("Antalet måste vara ett nummer.");
+                            continue;
+                        }
+
+                        if (quantity <= 0)
+                        {
+                            Console.WriteLine("Antalet måste vara större än 0.");
+                            continue;
+                        }
+
+                        Product product = products.Find(p => p.Id == productId);
+
+                        if (product == null)
+                        {
+                            Console.WriteLine("Produkten finns inte.");
+                            continue;
+                        }
+
+                        SaleProducts saleProduct = new SaleProducts();
+                        saleProduct.Product = product;
+                        saleProduct.Quantity = quantity;
+
+                        sale.SaleItems.Add(saleProduct);
+                       
+                        double currentTotalPrice = product.Price * quantity;
+                        total += currentTotalPrice;
+
+                        Console.WriteLine($"{product.Name}");
+                        Console.WriteLine($"{quantity} {product.PriceType} x {product.Price} kr = {currentTotalPrice} kr");
+                        Console.WriteLine($"Total: {total} kr");
+                    }
+
+                    Console.WriteLine("Försäljning slutförd!");
+                    Console.WriteLine($"Totalt: {total} kr");
+
+                    Receipt receipt = new Receipt();
+
+                    receipt.Date = DateTime.Now;
+                    receipt.Sale = sale;
+                    receipt.Total = total;
+
+                    ReceiptRepository receiptRepository = new ReceiptRepository();
+                    receiptRepository.SaveReceipt(receipt);
+
+                    Console.WriteLine();
+                    Console.WriteLine("===== KVITTO =====");
+                    Console.WriteLine($"Datum: {receipt.Date}");
+
+                    foreach (SaleProducts item in receipt.Sale.SaleItems)
+                    {
+                        double price = item.Product.Price * item.Quantity;
+
+                        Console.WriteLine(
+                            $"{item.Product.Name} - {item.Quantity} {item.Product.PriceType} x {item.Product.Price} kr = {price} kr");
+                    }
+
+                    Console.WriteLine($"TOTALT: {receipt.Total} kr");
+                    Console.WriteLine("==================");
 
                     break;
 
