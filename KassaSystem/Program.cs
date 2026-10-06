@@ -70,8 +70,10 @@ namespace KassaSystem
                         saleProduct.Quantity = quantity;
 
                         sale.SaleItems.Add(saleProduct);
-                       
-                        double currentTotalPrice = product.Price * quantity;
+
+                        PriceCalculator priceCalculator = new PriceCalculator();
+
+                        double currentTotalPrice = priceCalculator.CalculatePrice(product.Price, quantity);
                         total += currentTotalPrice;
 
                         Console.WriteLine($"{product.Name}");
@@ -87,8 +89,8 @@ namespace KassaSystem
                     receipt.Date = DateTime.Now;
                     receipt.Sale = sale;
                     receipt.Total = total;
-
-                    ReceiptRepository receiptRepository = new ReceiptRepository();
+                    
+                    IReceiptRepository receiptRepository = new ReceiptRepository();
                     receiptRepository.SaveReceipt(receipt);
 
                     Console.WriteLine();

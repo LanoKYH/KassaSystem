@@ -10,18 +10,40 @@ namespace KassaSystem
         {
             List<Product> products = new List<Product>();
 
-            string[] lines = File.ReadAllLines("products.txt");
+            string[] lines;
+
+            try
+            {
+                lines = File.ReadAllLines("products.txt");
+            }
+            catch
+            {
+                Console.WriteLine("Kunde inte läsa products.txt.");
+                return products;
+            }
 
             foreach (string line in lines)
             {
                 string[] parts = line.Split(';');
 
+                if (parts.Length != 4)
+                {
+                    Console.WriteLine("Fel format i products.txt.");
+                    continue;
+                }
+
                 Product product = new Product();
 
                 product.Id = parts[0];
                 product.Name = parts[1];
-                product.Price = Convert.ToDouble(parts[2]);
-                product.PriceType = parts[3];
+               
+                if (!double.TryParse(parts[2], out double price))
+                {
+                    Console.WriteLine($"Fel pris för produkten {parts[0]}.");
+                    continue;
+                }
+
+                product.Price = price; product.PriceType = parts[3];
 
                 products.Add(product);
             }

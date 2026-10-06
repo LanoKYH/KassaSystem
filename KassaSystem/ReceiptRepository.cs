@@ -3,7 +3,7 @@ using System.IO;
 
 namespace KassaSystem
 {
-    public class ReceiptRepository
+    public class ReceiptRepository : IReceiptRepository
     {
         public void SaveReceipt(Receipt receipt)
         {
@@ -22,7 +22,15 @@ namespace KassaSystem
             receiptText += $"TOTALT: {receipt.Total} kr\n";
             receiptText += "==================\n";
 
-            File.AppendAllText(fileName, receiptText);
+            try
+            {
+                File.AppendAllText(fileName, receiptText);
+                Console.WriteLine("Kvitto sparat.");
+            }
+            catch
+            {
+                Console.WriteLine("Kunde inte spara kvittot.");
+            }
         }
     }
 }
