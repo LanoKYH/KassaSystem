@@ -8,6 +8,7 @@ namespace KassaSystem
         static void Main()
         {
             List<Product> products = new ProductRepository().LoadProducts();
+            CampaignRepository campaignRepository = new CampaignRepository();
 
             Console.WriteLine("=== KASSASYSTEM ===");
             Console.WriteLine("1. Ny försäljning");
@@ -65,19 +66,30 @@ namespace KassaSystem
                             continue;
                         }
 
+                        Campaign activeCampaign = campaignRepository.GetActiveCampaign(product);
+
                         SaleProducts saleProduct = new SaleProducts();
                         saleProduct.Product = product;
                         saleProduct.Quantity = quantity;
+
+                        double priceToUse = product.Price;
+
+                        if (activeCampaign != null)
+                        {
+                            priceToUse = activeCampaign.CampaignPrice;
+                        }
+
+                        saleProduct.UnitPrice = priceToUse;
 
                         sale.SaleItems.Add(saleProduct);
 
                         PriceCalculator priceCalculator = new PriceCalculator();
 
-                        double currentTotalPrice = priceCalculator.CalculatePrice(product.Price, quantity);
+                        double currentTotalPrice = priceCalculator.CalculatePrice(product, quantity, activeCampaign);
                         total += currentTotalPrice;
 
                         Console.WriteLine($"{product.Name}");
-                        Console.WriteLine($"{quantity} {product.PriceType} x {product.Price} kr = {currentTotalPrice} kr");
+                        Console.WriteLine($"{quantity} {product.PriceType} x {saleProduct.UnitPrice} kr = {currentTotalPrice} kr");
                         Console.WriteLine($"Total: {total} kr");
                     }
 
@@ -99,10 +111,10 @@ namespace KassaSystem
 
                     foreach (SaleProducts item in receipt.Sale.SaleItems)
                     {
-                        double price = item.Product.Price * item.Quantity;
+                        double price = item.UnitPrice * item.Quantity;
 
                         Console.WriteLine(
-                            $"{item.Product.Name} - {item.Quantity} {item.Product.PriceType} x {item.Product.Price} kr = {price} kr");
+                            $"{item.Product.Name} - {item.Quantity} {item.Product.PriceType} x {item.UnitPrice} kr = {price} kr");
                     }
 
                     Console.WriteLine($"TOTALT: {receipt.Total} kr");
@@ -111,7 +123,8 @@ namespace KassaSystem
                     break;
 
                 case "2":
-                    Console.WriteLine("Välkommen till Admin Panel");
+                    AdminService adminService = new AdminService();
+                    adminService.ShowAdminMenu(products, campaignRepository);
                     break;
 
                 case "0":

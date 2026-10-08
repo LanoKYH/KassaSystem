@@ -8,6 +8,7 @@ namespace KassaSystem
     {
         public Product Product { get; set; }
         public double Quantity { get; set; } 
+        public double UnitPrice { get; set; }
 
     } 
 

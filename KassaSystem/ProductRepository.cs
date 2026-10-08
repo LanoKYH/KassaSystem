@@ -43,12 +43,33 @@ namespace KassaSystem
                     continue;
                 }
 
-                product.Price = price; product.PriceType = parts[3];
+                product.Price = price;
+                product.PriceType = parts[3];
 
                 products.Add(product);
             }
 
             return products;
+        }
+
+        public void SaveProducts(List<Product> products)
+        {
+            List<string> lines = new List<string>();
+
+            foreach (Product product in products)
+            {
+                lines.Add($"{product.Id};{product.Name};{product.Price};{product.PriceType}");
+            }
+
+            try
+            {
+                File.WriteAllLines("products.txt", lines);
+                Console.WriteLine("Produkter sparade.");
+            }
+            catch
+            {
+                Console.WriteLine("Kunde inte spara produkterna.");
+            }
         }
     }
 }
