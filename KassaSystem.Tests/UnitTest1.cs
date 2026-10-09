@@ -44,5 +44,28 @@ namespace KassaSystem.Tests
             Assert.Throws<ArgumentException>(() =>
                 calculator.CalculatePrice(15, 0));
         }
+
+        [Fact]
+        public void CalculateTotal_UsesCampaignPrice()
+        {
+            Product product = new Product();
+            product.Id = "463";
+            product.Name = "Coca-Cola";
+            product.Price = 30;
+
+            SaleProducts item = new SaleProducts();
+            item.Product = product;
+            item.Quantity = 2;
+            item.UnitPrice = 15;
+
+            Sale sale = new Sale();
+            sale.SaleItems.Add(item);
+
+            SaleCalculator calculator = new SaleCalculator();
+
+            double result = calculator.CalculateTotal(sale);
+
+            Assert.Equal(30, result);
+        }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace KassaSystem
 {
@@ -9,5 +7,6 @@ namespace KassaSystem
         public DateTime Date { get; set; }
         public Sale Sale { get; set; }
         public double Total { get; set; }
+        public int ReceiptNumber { get; set; }
     }
 }

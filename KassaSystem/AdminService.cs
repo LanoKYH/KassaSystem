@@ -7,6 +7,7 @@ namespace KassaSystem
     {
         public void ShowAdminMenu(List<Product> products, CampaignRepository campaignRepository)
         {
+            Console.WriteLine();
             Console.WriteLine("=== ADMIN PANEL ===");
             Console.WriteLine("1. Lägg till produkt");
             Console.WriteLine("2. Ändra produkt");
@@ -73,6 +74,43 @@ namespace KassaSystem
                     break;
 
                 case "2":
+                    Console.WriteLine("Ange produkt ID för produkten du vill ändra:");
+                    string productIdToChange = Console.ReadLine();
+
+                    Product productToChange = products.Find(p => p.Id == productIdToChange);
+
+                    if (productToChange == null)
+                    {
+                        Console.WriteLine("Produkten finns inte.");
+                        break;
+                    }
+
+                    Console.WriteLine("Ange nytt produktnamn:");
+                    string newName = Console.ReadLine();
+
+                    productToChange.Name = newName;
+
+                    Console.WriteLine("Ange nytt pris:");
+
+                    if (!double.TryParse(Console.ReadLine(), out double newPrice))
+                    {
+                        Console.WriteLine("Priset måste vara ett nummer.");
+                        break;
+                    }
+
+                    if (newPrice <= 0)
+                    {
+                        Console.WriteLine("Priset måste vara större än 0.");
+                        break;
+                    }
+
+                    productToChange.Price = newPrice;
+
+                    ProductRepository repository = new ProductRepository();
+                    repository.SaveProducts(products);
+
+                    Console.WriteLine("Produkten har uppdaterats.");
+
                     break;
 
 
@@ -131,7 +169,7 @@ namespace KassaSystem
                     campaign.EndDate = endDate;
 
                     campaignRepository.AddCampaign(campaign);
-
+                    campaignRepository.SaveCampaigns();
                     Console.WriteLine("Kampanj skapad!");
 
                     break;
@@ -157,18 +195,20 @@ namespace KassaSystem
                     }
 
                     campaignRepository.RemoveCampaign(campaignToRemove);
-
+                    campaignRepository.SaveCampaigns();
                     Console.WriteLine("Kampanjen har tagits bort.");
 
                     break;
 
                 case "0":
-                    Console.WriteLine("Tillbaka");
-                    break;
+                    Console.WriteLine();
+                    Console.WriteLine("Återgår till huvudmenyn..");
+                    Console.WriteLine();
+                    return;
 
                 default:
                     Console.WriteLine("Ogiltigt val.");
-                    break;
+                    return;
             }
         }
     }
