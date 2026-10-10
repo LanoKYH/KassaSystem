@@ -12,9 +12,10 @@ namespace KassaSystem
 
         public bool IsActive()
         {
-            DateTime now = DateTime.Now;
+            DateTime today = DateTime.Today;
 
-            return now >= StartDate && now <= EndDate;
+            return today >= StartDate.Date && today <= EndDate.Date;
         }
+
     }
 }

@@ -52,13 +52,15 @@ namespace KassaSystem
             return products;
         }
 
+
         public void SaveProducts(List<Product> products)
         {
             List<string> lines = new List<string>();
 
             foreach (Product product in products)
             {
-                lines.Add($"{product.Id};{product.Name};{product.Price};{product.PriceType}");
+                lines.Add(
+                    $"{product.Id};{product.Name};{product.Price};{product.PriceType}");
             }
 
             try
@@ -66,10 +68,17 @@ namespace KassaSystem
                 File.WriteAllLines("products.txt", lines);
                 Console.WriteLine("Produkter sparade.");
             }
-            catch
+            catch (IOException)
             {
                 Console.WriteLine("Kunde inte spara produkterna.");
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Åtkomst nekad när produkterna skulle sparas.");
+                throw;
             }
         }
+
     }
 }

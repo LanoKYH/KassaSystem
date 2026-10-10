@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace KassaSystem
@@ -70,6 +71,12 @@ namespace KassaSystem
                                 continue;
                             }
 
+                            if (!product.IsAvailable)
+                            {
+                                Console.WriteLine("Produkten är inte tillgänglig för försäljning.");
+                                continue;
+                            }
+
                             Campaign activeCampaign = campaignRepository.GetActiveCampaign(product);
 
                             SaleProducts saleProduct = new SaleProducts();
@@ -99,25 +106,43 @@ namespace KassaSystem
                             Console.WriteLine($"Total: {total} kr");
                         }
 
-                        Console.WriteLine("Försäljning slutförd!");
-                        Console.WriteLine($"Totalt: {total} kr");
+
+                        if (sale.SaleItems.Count == 0)
+                        {
+                            Console.WriteLine("Försäljningen innehåller inga produkter.");
+                            break;
+                        }
 
                         Receipt receipt = new Receipt();
 
-                        ReceiptNumberRepository numberRepository = new ReceiptNumberRepository();
-                        receipt.ReceiptNumber = numberRepository.GetNextReceiptNumber();
+                        try
+                        {
+                            ReceiptNumberRepository numberRepository =
+                                new ReceiptNumberRepository();
 
-                        receipt.Date = DateTime.Now;
-                        receipt.Sale = sale;
-                        receipt.Total = total;
+                            receipt.ReceiptNumber = numberRepository.GetNextReceiptNumber();
+                            receipt.Date = DateTime.Now;
+                            receipt.Sale = sale;
+                            receipt.Total = total;
 
-                        IReceiptRepository receiptRepository = new ReceiptRepository();
-                        receiptRepository.SaveReceipt(receipt);
+                            IReceiptRepository receiptRepository = new ReceiptRepository();
+                            receiptRepository.SaveReceipt(receipt);
 
-                        Console.WriteLine();
-                        Console.WriteLine("===== KVITTO =====");
-                        Console.WriteLine($"Kvittonummer: {receipt.ReceiptNumber}");
-                        Console.WriteLine($"Datum: {receipt.Date}");
+                            Console.WriteLine("Försäljning slutförd!");
+                            Console.WriteLine($"Totalt: {total} kr");
+                        }
+                        catch (IOException)
+                        {
+                            Console.WriteLine(
+                                "Försäljningen kunde inte slutföras eftersom kvittot inte kunde sparas.");
+                            break;
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            Console.WriteLine(
+                                "Försäljningen kunde inte slutföras eftersom åtkomst till kvittofilen nekades.");
+                            break;
+                        }
 
                         foreach (SaleProducts item in receipt.Sale.SaleItems)
                         {

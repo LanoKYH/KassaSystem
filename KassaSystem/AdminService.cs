@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace KassaSystem
@@ -20,7 +21,7 @@ namespace KassaSystem
             switch (choice)
             {
                 case "1":
-                   
+
                     Console.WriteLine("Ange produkt ID:");
                     string newProductId = Console.ReadLine();
 
@@ -34,6 +35,12 @@ namespace KassaSystem
 
                     Console.WriteLine("Ange produktnamn:");
                     string newProductName = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(newProductName))
+                    {
+                        Console.WriteLine("Produktnamnet får inte vara tomt.");
+                        break;
+                    }
 
                     Console.WriteLine("Ange pris:");
                     if (!double.TryParse(Console.ReadLine(), out double newProductPrice))
@@ -58,7 +65,6 @@ namespace KassaSystem
                     }
 
                     Product newProduct = new Product();
-
                     newProduct.Id = newProductId;
                     newProduct.Name = newProductName;
                     newProduct.Price = newProductPrice;
@@ -66,14 +72,27 @@ namespace KassaSystem
 
                     products.Add(newProduct);
 
-                    ProductRepository productRepository = new ProductRepository();
-                    productRepository.SaveProducts(products);
-
-                    Console.WriteLine("Produkten har lagts till.");
+                    try
+                    {
+                        ProductRepository productRepository = new ProductRepository();
+                        productRepository.SaveProducts(products);
+                        Console.WriteLine("Produkten har lagts till.");
+                    }
+                    catch (IOException)
+                    {
+                        products.Remove(newProduct);
+                        Console.WriteLine("Produkten kunde inte sparas och har därför inte lagts till.");
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        products.Remove(newProduct);
+                        Console.WriteLine("Åtkomst nekad. Produkten har inte lagts till.");
+                    }
 
                     break;
 
                 case "2":
+
                     Console.WriteLine("Ange produkt ID för produkten du vill ändra:");
                     string productIdToChange = Console.ReadLine();
 
@@ -88,7 +107,11 @@ namespace KassaSystem
                     Console.WriteLine("Ange nytt produktnamn:");
                     string newName = Console.ReadLine();
 
-                    productToChange.Name = newName;
+                    if (string.IsNullOrWhiteSpace(newName))
+                    {
+                        Console.WriteLine("Produktnamnet får inte vara tomt.");
+                        break;
+                    }
 
                     Console.WriteLine("Ange nytt pris:");
 
@@ -104,12 +127,30 @@ namespace KassaSystem
                         break;
                     }
 
+                    string oldName = productToChange.Name;
+                    double oldPrice = productToChange.Price;
+
+                    productToChange.Name = newName;
                     productToChange.Price = newPrice;
 
-                    ProductRepository repository = new ProductRepository();
-                    repository.SaveProducts(products);
-
-                    Console.WriteLine("Produkten har uppdaterats.");
+                    try
+                    {
+                        ProductRepository repository = new ProductRepository();
+                        repository.SaveProducts(products);
+                        Console.WriteLine("Produkten har uppdaterats.");
+                    }
+                    catch (IOException)
+                    {
+                        productToChange.Name = oldName;
+                        productToChange.Price = oldPrice;
+                        Console.WriteLine("Produkten kunde inte sparas. Ändringarna har återställts.");
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        productToChange.Name = oldName;
+                        productToChange.Price = oldPrice;
+                        Console.WriteLine("Åtkomst nekad. Ändringarna har återställts.");
+                    }
 
                     break;
 

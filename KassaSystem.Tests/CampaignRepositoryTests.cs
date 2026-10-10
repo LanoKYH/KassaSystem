@@ -34,5 +34,15 @@ namespace KassaSystem.Tests
             Assert.NotNull(result);
             Assert.Equal(15, result.CampaignPrice);
         }
+
+        [Fact]
+        public void IsActive_CampaignOnEndDate_ReturnsTrue()
+        {
+            Campaign campaign = new Campaign();
+            campaign.StartDate = DateTime.Today.AddDays(-2);
+            campaign.EndDate = DateTime.Today;
+
+            Assert.True(campaign.IsActive());
+        }
     }
 }
