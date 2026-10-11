@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace KassaSystem
 {
@@ -41,7 +42,7 @@ namespace KassaSystem
                                 break;
                             }
 
-                            string[] parts = input.Split(' ');
+                            string[] parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                             if (parts.Length != 2)
                             {
@@ -51,10 +52,11 @@ namespace KassaSystem
 
                             string productId = parts[0];
 
-                            if (!double.TryParse(parts[1], out double quantity))
+                            if (!double.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out double quantity)) 
                             {
-                                Console.WriteLine("Antalet måste vara ett nummer.");
-                                continue;
+                                Console.WriteLine("Antalet måste vara ett nummer."); 
+                            
+                                continue; 
                             }
 
                             if (quantity <= 0)
@@ -101,9 +103,9 @@ namespace KassaSystem
                             SaleCalculator saleCalculator = new SaleCalculator();
                             total = saleCalculator.CalculateTotal(sale);
 
-                            Console.WriteLine($"{product.Name}");
-                            Console.WriteLine($"{quantity} {product.PriceType} x {saleProduct.UnitPrice} kr = {currentTotalPrice} kr");
-                            Console.WriteLine($"Total: {total} kr");
+                            Console.WriteLine($"{product.Name} - {quantity} {product.PriceType} x " + $"{saleProduct.UnitPrice:F2} kr = {currentTotalPrice:F2} kr");
+                            Console.WriteLine($"Delsumma: {total:F2} kr");
+                            Console.WriteLine();
                         }
 
 
@@ -129,35 +131,36 @@ namespace KassaSystem
                             receiptRepository.SaveReceipt(receipt);
 
                             Console.WriteLine("Försäljning slutförd!");
-                            Console.WriteLine($"Totalt: {total} kr");
+                            Console.WriteLine($"Totalt: {total:F2} kr");
                         }
                         catch (IOException)
                         {
-                            Console.WriteLine(
-                                "Försäljningen kunde inte slutföras eftersom kvittot inte kunde sparas.");
+                            Console.WriteLine("Försäljningen kunde inte slutföras eftersom kvittot inte kunde sparas.");
                             break;
                         }
                         catch (UnauthorizedAccessException)
                         {
-                            Console.WriteLine(
-                                "Försäljningen kunde inte slutföras eftersom åtkomst till kvittofilen nekades.");
+                            Console.WriteLine("Försäljningen kunde inte slutföras eftersom åtkomst till kvittofilen nekades.");
                             break;
                         }
+
+                        Console.WriteLine();
+                        Console.WriteLine("========== KVITTO ==========");
+                        Console.WriteLine($"Kvittonummer: {receipt.ReceiptNumber}");
+                        Console.WriteLine($"Datum: {receipt.Date:yyyy-MM-dd HH:mm:ss}");
+                        Console.WriteLine("----------------------------");
 
                         foreach (SaleProducts item in receipt.Sale.SaleItems)
                         {
                             double price = item.UnitPrice * item.Quantity;
 
-                            Console.WriteLine(
-                                $"{item.Product.Name} - {item.Quantity} {item.Product.PriceType} x {item.UnitPrice} kr = {price} kr");
+                            Console.WriteLine($"{item.Product.Name}");
+                            Console.WriteLine($"  {item.Quantity} {item.Product.PriceType} x {item.UnitPrice:F2} kr = {price:F2} kr");
                         }
 
-                        Console.WriteLine($"TOTALT: {receipt.Total} kr");
-                        Console.WriteLine("==================");
-
-                        Console.WriteLine();
-                        Console.WriteLine("Tryck ENTER för att återgå till huvudmenyn.");
-                        Console.ReadLine();
+                        Console.WriteLine("----------------------------");
+                        Console.WriteLine($"TOTALT: {receipt.Total:F2} kr");
+                        Console.WriteLine("============================");
                         break;
 
                     case "2":

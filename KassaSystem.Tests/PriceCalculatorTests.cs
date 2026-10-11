@@ -46,6 +46,27 @@ namespace KassaSystem.Tests
         }
 
         [Fact]
+        public void CalculatePrice_ActiveCampaign_UsesCampaignPrice()
+        {
+            Product product = new Product();
+            product.Id = "463";
+            product.Name = "Coca-Cola";
+            product.Price = 30;
+
+            Campaign campaign = new Campaign();
+            campaign.Product = product;
+            campaign.CampaignPrice = 15;
+            campaign.StartDate = DateTime.Today.AddDays(-1);
+            campaign.EndDate = DateTime.Today.AddDays(1);
+
+            PriceCalculator calculator = new PriceCalculator();
+
+            double result = calculator.CalculatePrice(product, 2, campaign);
+
+            Assert.Equal(30, result);
+        }
+
+        [Fact]
         public void CalculateTotal_UsesCampaignPrice()
         {
             Product product = new Product();

@@ -7,7 +7,12 @@ namespace KassaSystem
     public class CampaignRepository
     {
         private List<Campaign> campaigns = new List<Campaign>();
-        private string fileName = "campaigns.txt";
+        private string fileName;
+
+        public CampaignRepository(string fileName = "campaigns.txt")
+        {
+            this.fileName = fileName;
+        }
 
         public void AddCampaign(Campaign campaign)
         {
@@ -33,12 +38,17 @@ namespace KassaSystem
                 File.WriteAllLines(fileName, lines);
                 Console.WriteLine("Kampanjer sparade.");
             }
-            catch
+            catch (IOException)
             {
                 Console.WriteLine("Kunde inte spara kampanjerna.");
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Åtkomst nekad när kampanjerna skulle sparas.");
+                throw;
             }
         }
-
 
         public void LoadCampaigns(List<Product> products)
         {

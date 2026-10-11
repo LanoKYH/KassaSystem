@@ -210,46 +210,64 @@ namespace KassaSystem
                     campaign.EndDate = endDate;
 
                     campaignRepository.AddCampaign(campaign);
-                    campaignRepository.SaveCampaigns();
-                    Console.WriteLine("Kampanj skapad!");
+
+                    try
+                    {
+                        campaignRepository.SaveCampaigns();
+                        Console.WriteLine("Kampanj skapad!");
+                    }
+                    catch (IOException)
+                    {
+                        campaignRepository.RemoveCampaign(campaign);
+                        Console.WriteLine("Kampanjen kunde inte sparas och har därför inte skapats.");
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        campaignRepository.RemoveCampaign(campaign);
+                        Console.WriteLine("Åtkomst nekad. Kampanjen har inte skapats.");
+                    }
 
                     break;
 
                 case "4":
-                    Console.WriteLine("Ange produkt-ID för kampanjen:");
-                    string productIdToRemove = Console.ReadLine();
+                    List<Campaign> campaigns = campaignRepository.GetCampaigns();
 
-                    Product productToRemove = products.Find(p => p.Id == productIdToRemove);
-
-                    if (productToRemove == null)
+                    if (campaigns.Count == 0)
                     {
-                        Console.WriteLine("Produkten finns inte.");
+                        Console.WriteLine("Det finns inga kampanjer att ta bort.");
                         break;
                     }
 
-                    Campaign campaignToRemove = campaignRepository.GetActiveCampaign(productToRemove);
+                    Console.WriteLine("Välj kampanjen som ska tas bort:");
 
-                    if (campaignToRemove == null)
+                    for (int i = 0; i < campaigns.Count; i++)
                     {
-                        Console.WriteLine("Produkten har ingen aktiv kampanj.");
+                        Campaign listedCampaign = campaigns[i];
+
+                        Console.WriteLine(
+                            $"{i + 1}. {listedCampaign.Product.Name} - " +
+                            $"{listedCampaign.CampaignPrice} kr - " +
+                            $"{listedCampaign.StartDate:yyyy-MM-dd} till {listedCampaign.EndDate:yyyy-MM-dd}");
+                    }
+
+                    Console.WriteLine("Ange kampanjens nummer:");
+                    string campaignChoice = Console.ReadLine();
+
+                    if (!int.TryParse(campaignChoice, out int campaignIndex) ||
+                        campaignIndex < 1 ||
+                        campaignIndex > campaigns.Count)
+                    {
+                        Console.WriteLine("Ogiltigt kampanjnummer.");
                         break;
                     }
+
+                    Campaign campaignToRemove = campaigns[campaignIndex - 1];
 
                     campaignRepository.RemoveCampaign(campaignToRemove);
                     campaignRepository.SaveCampaigns();
+
                     Console.WriteLine("Kampanjen har tagits bort.");
-
                     break;
-
-                case "0":
-                    Console.WriteLine();
-                    Console.WriteLine("Återgår till huvudmenyn..");
-                    Console.WriteLine();
-                    return;
-
-                default:
-                    Console.WriteLine("Ogiltigt val.");
-                    return;
             }
         }
     }

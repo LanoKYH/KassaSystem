@@ -112,7 +112,6 @@ namespace KassaSystem.Tests
             }
         }
 
-
         [Fact]
         public void GetNextReceiptNumber_IncreasesAndPersistsNumber()
         {
@@ -137,6 +136,7 @@ namespace KassaSystem.Tests
                 Assert.Equal(1002, secondNumber);
                 Assert.Equal(1003, thirdNumber);
             }
+
             finally
             {
                 if (File.Exists(fileName))

@@ -8,9 +8,9 @@ public class Product
     public bool IsAvailable { get; private set; }
 
     public Product()
+
         {
         IsAvailable = true;
-
         }
 
     public void MakeUnavailable()

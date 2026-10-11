@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace KassaSystem
@@ -36,8 +37,8 @@ namespace KassaSystem
 
                 product.Id = parts[0];
                 product.Name = parts[1];
-               
-                if (!double.TryParse(parts[2], out double price))
+
+                if (!double.TryParse(parts[2], NumberStyles.Number, CultureInfo.InvariantCulture, out double price))
                 {
                     Console.WriteLine($"Fel pris för produkten {parts[0]}.");
                     continue;
@@ -59,8 +60,7 @@ namespace KassaSystem
 
             foreach (Product product in products)
             {
-                lines.Add(
-                    $"{product.Id};{product.Name};{product.Price};{product.PriceType}");
+                lines.Add($"{product.Id};{product.Name};{product.Price.ToString(CultureInfo.InvariantCulture)};{product.PriceType}");
             }
 
             try
