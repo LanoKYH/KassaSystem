@@ -7,6 +7,12 @@ namespace KassaSystem
 {
     public class ProductRepository
     {
+        private readonly string fileName;
+
+        public ProductRepository(string fileName = "products.txt")
+        {
+            this.fileName = fileName;
+        }
         public List<Product> LoadProducts()
         {
             List<Product> products = new List<Product>();
@@ -15,7 +21,7 @@ namespace KassaSystem
 
             try
             {
-                lines = File.ReadAllLines("products.txt");
+                lines = File.ReadAllLines(fileName);
             }
             catch
             {
@@ -65,7 +71,7 @@ namespace KassaSystem
 
             try
             {
-                File.WriteAllLines("products.txt", lines);
+                File.WriteAllLines(fileName, lines);
                 Console.WriteLine("Produkter sparade.");
             }
             catch (IOException)

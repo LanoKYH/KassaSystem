@@ -145,5 +145,60 @@ namespace KassaSystem.Tests
                 }
             }
         }
+
+
+        [Fact]
+        public void Checkout_CalculateTotalAndSaveReceipt_SavesCorrectTotal()
+        {
+            string fileName = Path.Combine(
+                Path.GetTempPath(),
+                $"test_integration_{Guid.NewGuid()}.txt");
+
+            try
+            {
+                Product product = new Product();
+                product.Id = "463";
+                product.Name = "Coca-Cola";
+                product.Price = 30;
+                product.PriceType = "Styck";
+
+                SaleProducts item = new SaleProducts();
+                item.Product = product;
+                item.Quantity = 2;
+                item.UnitPrice = 30;
+
+                Sale sale = new Sale();
+                sale.SaleItems.Add(item);
+
+                SaleCalculator calculator = new SaleCalculator();
+                double total = calculator.CalculateTotal(sale);
+
+                Receipt receipt = new Receipt();
+                receipt.ReceiptNumber = 2001;
+                receipt.Date = DateTime.Now;
+                receipt.Sale = sale;
+                receipt.Total = total;
+
+                ReceiptRepository repository =
+                    new ReceiptRepository(fileName);
+
+                repository.SaveReceipt(receipt);
+
+                string savedText = File.ReadAllText(fileName);
+
+                Assert.Equal(60, total);
+                Assert.Contains("Kvittonummer: 2001", savedText);
+                Assert.Contains("Coca-Cola", savedText);
+                Assert.Contains("TOTALT: 60 kr", savedText);
+            }
+            finally
+            {
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+            }
+        }
+
     }
 }
